@@ -15,6 +15,7 @@ def macro_found(current_index):
     global ala
     global alac
     start = current_index
+    end = 0
     mnt.append([mdtc, macro_name])
     mntc = mntc+1
     to_append = ''
@@ -83,13 +84,15 @@ print('Macro Data Table:')
 print(mdt)
 print('Macro Name Table:')
 print(mnt)
+print('ALA Pass1')
+print(ala)
 print('Output Code of Pass1')
 print(output_pass_1)
-print('ALA')
-print(ala)
+
 # *********************************************************************************************
 # Pass 2 starts here
 macro_code_tokenized_by_line2 = output_pass_1.split('\n')
+pass_2_list = list(macro_code_tokenized_by_line2)
 macro_code_tokenized_by_word2 = list(macro_code_tokenized_by_line2)
 for i in range(0, len(macro_code_tokenized_by_line2)-1):
     macro_code_tokenized_by_word2[i] = macro_code_tokenized_by_line2[i].split(' ')  # Split by word
@@ -97,10 +100,10 @@ ala2 = []
 alac2 = 1
 pass_2_list = list(macro_code_tokenized_by_line2)
 macro_name_array = [i[1] for i in mnt]
-print(macro_name_array)
-
+global mdt_index
 for i in range(0, len(macro_code_tokenized_by_line2)-1):
     if macro_code_tokenized_by_word2[i][0] in macro_name_array:
+        pass_2_list.remove(macro_code_tokenized_by_line2[i])
         for j in range(0, len(mnt)):
             if macro_code_tokenized_by_word2[i][0] == mnt[j][1]:
                 mdt_index = mnt[j][0]
@@ -111,8 +114,18 @@ for i in range(0, len(macro_code_tokenized_by_line2)-1):
                 for x in range(0, len(macro_arguments)):
                     ala2.append([alac2, macro_arguments[x]])
                     alac2 += 1
-                print(ala2)
+            x = pass_2_list.index(macro_code_tokenized_by_line2[i+1])
+            while mdt[mdt_index][1] != 'MEND':
+                pass_2_list.insert(x, mdt[mdt_index][1])
+                mdt_index += 1
+                x += 1
         except IndexError:
             pass
 
-
+output_pass_2 = '\n'.join(pass_2_list)
+for x in range(0, len(ala2)):
+    arg1 = "#"+str(ala2[x][0])
+    arg2 = ala2[x][1]
+    output_pass_2 = output_pass_2.replace(arg1, arg2)
+print("Final Output:")
+print(output_pass_2)
